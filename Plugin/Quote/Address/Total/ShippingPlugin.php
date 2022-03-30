@@ -42,6 +42,9 @@ class ShippingPlugin
         ShippingAssignmentInterface $shippingAssignment,
         Total $total
     ) {
+        if ($quote->getIsVirtual()) {
+            return null;
+        }
         $items = $shippingAssignment->getItems();
         if (!count($items)) {
             return null;
