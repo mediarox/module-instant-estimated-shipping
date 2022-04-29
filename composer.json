@@ -1,8 +1,8 @@
 {
   "name": "mediarox/module-instant-estimated-shipping",
-  "description": "This Magento 2 module automatically determines & sets (based on the configured default country) the cheapest shipping method once the shopping cart is calculated.",
+  "description": "This Magento 2 module automatically determines & sets (based on the configured default country) the highest shipping method once the shopping cart is calculated.",
   "type": "magento2-module",
-  "version": "0.1.4",
+  "version": "0.2.0",
   "license": [
     "MIT"
   ],
