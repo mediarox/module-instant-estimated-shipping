@@ -191,7 +191,7 @@ class DefaultConfigProviderPlugin
         if (isset($this->addressMethods[$addressId])) {
             return $this->addressMethods[$addressId];
         }
-        if ($customerAddrId = $shippingAddress->getCustomerAddressId()) {
+        if ($customerAddrId = (int)$shippingAddress->getCustomerAddressId()) {
             $methods = $this->methodManagement->estimateByAddressId(
                 $shippingAddress->getQuoteId(),
                 $customerAddrId
