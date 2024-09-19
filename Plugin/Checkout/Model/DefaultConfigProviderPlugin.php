@@ -22,41 +22,34 @@ use Magento\Quote\Model\Quote;
 use Magento\Quote\Model\ShippingAssignmentFactory;
 use Magento\Quote\Model\ShippingFactory;
 use Magento\Store\Model\StoreManagerInterface;
+use Mediarox\InstantEstimatedShipping\Model\Config;
 
 class DefaultConfigProviderPlugin
 {
-    protected Session $checkoutSession;
-    protected Data $directoryHelper;
-    protected StoreManagerInterface $storeManager;
-    protected CartExtensionFactory $cartExtensionFactory;
-    protected ShippingAssignmentFactory $assignmentFactory;
-    protected ShippingFactory $shippingFactory;
-    protected ShippingMethodManagementInterface $methodManagement;
-    protected array $addressMethods;
+    protected mixed $addressMethods;
 
     public function __construct(
-        Session $checkoutSession,
-        Data $directoryHelper,
-        StoreManagerInterface $storeManager,
-        CartExtensionFactory $cartExtensionFactory,
-        ShippingAssignmentFactory $assignmentFactory,
-        ShippingFactory $shippingFactory,
-        ShippingMethodManagementInterface $methodManagement
+        protected Session $checkoutSession,
+        protected Data $directoryHelper,
+        protected StoreManagerInterface $storeManager,
+        protected CartExtensionFactory $cartExtensionFactory,
+        protected ShippingAssignmentFactory $assignmentFactory,
+        protected ShippingFactory $shippingFactory,
+        protected ShippingMethodManagementInterface $methodManagement,
+        protected Config $config,
+        protected Quote\TotalsCollector $totalsCollector
     ) {
-        $this->checkoutSession = $checkoutSession;
-        $this->directoryHelper = $directoryHelper;
-        $this->storeManager = $storeManager;
-        $this->cartExtensionFactory = $cartExtensionFactory;
-        $this->assignmentFactory = $assignmentFactory;
-        $this->shippingFactory = $shippingFactory;
-        $this->methodManagement = $methodManagement;
     }
 
     public function beforeGetConfig(DefaultConfigProvider $subject)
     {
-        $quote = $this->checkoutSession->getQuote();
-        $shippingAddress = $this->getShippingAddress($quote);
-        $this->processShippingAssignment($quote, $shippingAddress);
+        if ($this->config->getEnable()) {
+            $quote = $this->checkoutSession->getQuote();
+            $shippingAddress = $this->getShippingAddress($quote);
+            if (!$shippingAddress->getShippingMethod()) {
+                $this->processShippingAssignment($quote, $shippingAddress);
+            }
+        }
     }
 
     private function getShippingAddress(Quote $quote)
@@ -121,42 +114,37 @@ class DefaultConfigProviderPlugin
     {
         $shippingMethod = $this->getDefaultShippingMethod($shippingAddress);
 
-        $cartExtension = $quote->getExtensionAttributes();
-        if ($cartExtension === null) {
-            $cartExtension = $this->cartExtensionFactory->create();
+        if ($shippingMethod) {
+            $cartExtension = $quote->getExtensionAttributes();
+            if ($cartExtension === null) {
+                $cartExtension = $this->cartExtensionFactory->create();
+            }
+
+            $shippingAssignments = $cartExtension->getShippingAssignments();
+            if (empty($shippingAssignments)) {
+                $shippingAssignment = $this->assignmentFactory->create();
+            } else {
+                $shippingAssignment = $shippingAssignments[0];
+            }
+
+            $shipping = $shippingAssignment->getShipping();
+            if ($shipping === null) {
+                $shipping = $this->shippingFactory->create();
+            }
+
+            $carrierCode = $shippingMethod->getCarrierCode();
+            $shippingAddress->setLimitCarrier($carrierCode);
+            $methodCode = $shippingMethod->getMethodCode();
+            $method = $carrierCode . '_' . $methodCode;
+            $shippingAddress->setShippingMethod($method);
+            $shipping->setAddress($shippingAddress);
+            $shipping->setMethod($method);
+            $shippingAssignment->setShipping($shipping);
+            $shippingAssignment->setItems($quote->getItems());
+            $cartExtension->setShippingAssignments([$shippingAssignment]);
+            $quote->setExtensionAttributes($cartExtension);
+            $this->totalsCollector->collectAddressTotals($quote, $shippingAddress);
         }
-
-        $shippingAssignments = $cartExtension->getShippingAssignments();
-        if (empty($shippingAssignments)) {
-            $shippingAssignment = $this->assignmentFactory->create();
-        } else {
-            $shippingAssignment = $shippingAssignments[0];
-        }
-
-        if (!$shippingMethod) {
-            $cartExtension->setShippingAssignments([]);
-            $shippingAddress->setShippingMethod(null);
-
-            return $quote->setExtensionAttributes($cartExtension);
-        }
-
-        $shipping = $shippingAssignment->getShipping();
-        if ($shipping === null) {
-            $shipping = $this->shippingFactory->create();
-        }
-
-        $carrierCode = $shippingMethod->getCarrierCode();
-        $shippingAddress->setLimitCarrier($carrierCode);
-        $methodCode = $shippingMethod->getMethodCode();
-        $method = $carrierCode . '_' . $methodCode;
-        $shippingAddress->setShippingMethod($method);
-        $shipping->setAddress($shippingAddress);
-        $shipping->setMethod($method);
-        $shippingAssignment->setShipping($shipping);
-        $cartExtension->setShippingAssignments([$shippingAssignment]);
-        $quote->setTotalsCollectedFlag(false);
-
-        return $quote->setExtensionAttributes($cartExtension);
     }
 
     private function getDefaultShippingMethod(AddressInterface $shippingAddress)
@@ -172,16 +160,13 @@ class DefaultConfigProviderPlugin
             return reset($methods);
         }
 
-        if ($selectedMethod = $shippingAddress->getShippingMethod()) {
-            foreach ($methods as $method) {
-                if ($method->getCarrierCode() . '_' . $method->getMethodCode() == $selectedMethod) {
-                    return $method;
-                }
-            }
-        }
         usort($methods, function ($method1, $method2) {
-            return $method1->getPriceInclTax() <=> $method2->getPriceInclTax();
-        });
+                if ($this->config->getUseLowest()) {
+                    return $method1->getPriceInclTax() <=> $method2->getPriceInclTax();
+                }
+                return $method2->getPriceInclTax() <=> $method1->getPriceInclTax();
+            }
+        );
         return reset($methods);
     }
 

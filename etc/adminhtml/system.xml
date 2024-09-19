@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * @package Mediarox_InstantEstimatedShipping
+ * @copyright Copyright 2024(c) mediarox UG (haftungsbeschraenkt) (http://www.mediarox.de)
+ * @author Marcus Bernt <mbernt@mediarox.de>
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="mediarox">
+            <label>Mediarox</label>
+        </tab>
+        <section id="module_instant_estimated_shipping" showInDefault="1" showInWebsite="1"
+                 showInStore="1">
+            <tab>mediarox</tab>
+            <label>Instant Estimated Shipping</label>
+            <resource>Mediarox_InstantEstimatedShipping::config</resource>
+            <group id="general" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+                <field id="enable" showInDefault="1" showInWebsite="1" showInStore="1" translate="label" type="select">
+                    <label>Enable</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="use_lowest" showInDefault="1" showInWebsite="1" showInStore="1" translate="label" type="select">
+                    <label>Use Lowest Price</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>
