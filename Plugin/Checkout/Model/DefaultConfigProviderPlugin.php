@@ -43,8 +43,8 @@ class DefaultConfigProviderPlugin
 
     public function beforeGetConfig(DefaultConfigProvider $subject)
     {
-        if ($this->config->getEnable()) {
-            $quote = $this->checkoutSession->getQuote();
+        $quote = $this->checkoutSession->getQuote();
+        if ($this->config->getEnable() && $quote->getId()) {
             $shippingAddress = $this->getShippingAddress($quote);
             if (!$shippingAddress->getShippingMethod()) {
                 $this->processShippingAssignment($quote, $shippingAddress);
