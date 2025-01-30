@@ -46,9 +46,7 @@ class DefaultConfigProviderPlugin
         $quote = $this->checkoutSession->getQuote();
         if ($this->config->getEnable() && $quote->getId()) {
             $shippingAddress = $this->getShippingAddress($quote);
-            if (!$shippingAddress->getShippingMethod()) {
-                $this->processShippingAssignment($quote, $shippingAddress);
-            }
+            $this->processShippingAssignment($quote, $shippingAddress);
         }
     }
 
