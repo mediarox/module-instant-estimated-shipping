@@ -8,6 +8,11 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <type name="Magento\Checkout\Model\DefaultConfigProvider">
-        <plugin name="instant_estimated_shipping" type="Mediarox\InstantEstimatedShipping\Plugin\Checkout\Model\DefaultConfigProviderPlugin"/>
+        <plugin name="instant_estimated_shipping"
+                type="Mediarox\InstantEstimatedShipping\Plugin\Checkout\Model\DefaultConfigProviderPlugin"/>
+    </type>
+    <type name="Magento\Checkout\CustomerData\Cart">
+        <plugin name="add_shipping_totals_to_section_data_plugin"
+                type="Mediarox\InstantEstimatedShipping\Plugin\Checkout\CustomerData\CartPlugin"/>
     </type>
 </config>

@@ -1,0 +1,31 @@
+<div>
+    <span class="label">
+            <!-- ko i18n: 'Cart Subtotal' --><!-- /ko -->
+    </span>
+    <div class="amount price-container">
+        <span class="price-wrapper" data-bind="html: cart().subtotal"></span>
+    </div>
+</div>
+<!-- ko if: cart().enable_shipping_estimate -->
+    <!-- ko if: cart().shipping_incl_tax -->
+<div>
+    <span class="label">
+            <!-- ko i18n: 'Shipping incl. tax' --><!-- /ko -->
+    </span>
+    <div class="amount price-container">
+        <span class="price-wrapper" data-bind="html: cart().shipping_incl_tax"></span>
+    </div>
+</div>
+    <!-- /ko -->
+    <!-- ko if: cart().shipping_excl_tax -->
+<div>
+    <span class="label">
+            <!-- ko i18n: 'Shipping excl. tax' --><!-- /ko -->
+    </span>
+    <div class="amount price-container">
+
+        <span class="price-wrapper" data-bind="html: cart().shipping_excl_tax"></span>
+    </div>
+</div>
+    <!-- /ko -->
+<!-- /ko -->

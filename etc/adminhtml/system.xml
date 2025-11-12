@@ -26,6 +26,16 @@
                     <label>Use Lowest Price</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
+                <group id="minicart" showInDefault="1" showInWebsite="1" showInStore="1" translate="label">
+                    <field id="enable_minicart" showInDefault="1" showInWebsite="1" showInStore="1" translate="label" type="select">
+                        <label>Enable in Minicart</label>
+                        <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    </field>
+                    <field id="shipping" translate="label" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1" canRestore="1">
+                        <label>Display Shipping Amount in Minicart</label>
+                        <source_model>Magento\Tax\Model\System\Config\Source\Tax\Display\Type</source_model>
+                    </field>
+                </group>
             </group>
         </section>
     </system>

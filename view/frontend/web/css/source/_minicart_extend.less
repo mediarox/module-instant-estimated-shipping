@@ -1,0 +1,19 @@
+& when (@media-common = true) {
+  .block-minicart {
+    .subtotal {
+      margin: @indent__s + @indent__xxxxs 0;
+      .lib-css(font-size, @font-size__s);
+      .lib-flex(@flex-direction: column);
+
+      > div {
+        width: 100%;
+        display: flex;
+        flex-direction: row;
+
+        .amount.price-container .price-wrapper {
+          .lib-css(font-size, @font-size__s);
+        }
+      }
+    }
+  }
+}

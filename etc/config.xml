@@ -13,6 +13,10 @@
             <general>
                 <enable>1</enable>
                 <use_lowest>0</use_lowest>
+                <minicart>
+                    <enable_minicart>0</enable_minicart>
+                    <shipping>3</shipping>
+                </minicart>
             </general>
         </module_instant_estimated_shipping>
     </default>
